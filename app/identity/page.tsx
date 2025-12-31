@@ -29,10 +29,6 @@ export default function IdentityPage() {
   const { playAudio } = useGlobalAudio();
   const router = useRouter();
 
-  useEffect(() => {
-    playAudio("f1-theme");
-  }, []);
-
   return (
     <div className="h-screen bg-background-dark text-white font-display overflow-hidden">
       <Navbar />
