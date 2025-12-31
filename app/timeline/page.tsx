@@ -110,6 +110,15 @@ const months: Month[] = [
     ],
     images: ["/images/seawood/1.jpeg", "/images/seawood/2.jpeg", "/images/seawood/3.jpeg", "/images/seawood/4.jpeg","/images/seawood/5.jpeg", "/images/seawood/6.jpeg","/images/seawood/7.jpeg","/images/seawood/8.jpeg","/images/seawood/9.jpeg"],
   },
+  {
+    month: "Random Extras",
+    highlights: [
+      "Things that didn't fit elsewhere",
+    ],
+    images: ["images/extras/1.jpeg", "images/extras/2.jpeg", "images/extras/3.jpeg", "images/extras/4.jpeg", "images/extras/5.jpeg", "images/extras/6.jpeg", "images/extras/7.jpeg", "images/extras/8.jpeg", "images/extras/9.jpeg", "images/extras/10.jpeg", "images/extras/11.jpeg", "images/extras/12.jpeg", "images/extras/13.jpeg", "images/extras/14.jpeg", "images/extras/15.jpeg", "images/extras/16.jpeg", "images/extras/17.jpeg" 
+      ,"images/extras/18.jpeg", "images/extras/19.jpeg","images/extras/20.jpeg", "images/extras/21.jpeg","images/extras/22.jpeg","images/extras/23.jpeg","images/extras/24.jpeg","images/extras/25.jpeg","images/extras/26.jpeg","images/extras/27.jpeg","images/extras/28.jpeg","images/extras/29.jpeg","images/extras/30.jpeg","images/extras/1.mp4","images/extras/2.mp4"
+    ],
+  },
 ];
 
 export default function TimelinePage() {
@@ -125,20 +134,87 @@ export default function TimelinePage() {
     <div className="min-h-screen bg-background-dark text-white font-display relative pb-24">
       <Navbar title="2025 Timeline" />
 
-      {/* Month Grid */}
-      <div className="grid grid-cols-3 md:grid-cols-4 gap-6 max-w-6xl mx-auto p-6">
-        {months.map((month) => (
+{/* Month Grid */}
+{/* Anime Timeline */}
+<div
+  className="
+    relative
+    max-w-5xl
+    mx-auto
+    px-4 md:px-6
+    mt-12
+    max-h-[75vh]
+    overflow-y-auto
+    scrollbar-thin
+    scrollbar-thumb-primary/50
+    scrollbar-track-transparent
+  "
+  style={{
+    scrollbarWidth: "thin",
+    scrollbarColor: "rgba(255,79,216,0.5) transparent",
+  }}
+>
+
+  {/* Center Line */}
+  <div className="absolute left-4 md:left-1/2 top-0 bottom-0 w-[2px] bg-gradient-to-b from-primary/10 via-primary/40 to-primary/10" />
+
+  <div className="flex flex-col gap-16">
+    {months.map((month, i) => {
+      const isLeft = i % 2 === 0;
+
+      return (
+        <motion.div
+          key={month.month}
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className={`relative flex items-start ${
+            isLeft ? "md:flex-row" : "md:flex-row-reverse"
+          } gap-6`}
+        >
+
+          {/* Timeline Dot */}
+          <div className="relative z-10">
+            <div className="w-4 h-4 rounded-full bg-primary shadow-[0_0_20px_#ff4fd8]" />
+          </div>
+
+          {/* Content Card */}
           <motion.div
-            key={month.month}
-            whileHover={{ scale: 1.05 }}
+            whileHover={{ scale: 1.03 }}
             onClick={() => setSelectedMonth(month)}
-            className="cursor-pointer rounded-xl bg-[#33192b] p-6 flex flex-col items-center justify-center shadow-lg hover:shadow-2xl transition"
+            className="
+              cursor-pointer
+              w-full md:w-[45%]
+              rounded-3xl
+              bg-[#1b0b1a]/80
+              backdrop-blur-xl
+              p-6
+              shadow-xl
+              border border-white/10
+              hover:border-primary/40
+              transition
+            "
           >
-            <h3 className="text-xl font-bold text-primary">{month.month}</h3>
-            <p className="text-text-muted text-sm mt-2">{month.highlights[0]}</p>
+            <h3 className="text-2xl font-bold text-primary mb-2">
+              {month.month}
+            </h3>
+
+            <ul className="text-sm text-text-muted space-y-1">
+              {month.highlights.slice(0, 3).map((h, idx) => (
+                <li key={idx}>— {h}</li>
+              ))}
+            </ul>
+
+            <p className="mt-4 text-xs text-primary/70">
+              Tap to relive →
+            </p>
           </motion.div>
-        ))}
-      </div>
+        </motion.div>
+      );
+    })}
+  </div>
+</div>
 
       {/* Modal / Month Gallery */}
       <AnimatePresence>
@@ -154,7 +230,14 @@ export default function TimelinePage() {
               initial={{ scale: 0.8 }}
               animate={{ scale: 1 }}
               exit={{ scale: 0.8 }}
-              className="bg-[#1f0d1f] rounded-3xl p-6 max-w-5xl w-full overflow-y-auto max-h-full"
+              className="
+                          bg-[#1f0d1f]
+                          rounded-2xl md:rounded-3xl
+                          p-4 md:p-6
+                          max-w-5xl w-full
+                          max-h-[90vh]
+                          overflow-hidden
+                        "
             >
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-3xl font-bold text-primary">{selectedMonth.month}</h2>

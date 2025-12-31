@@ -1,17 +1,16 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 interface StoryCardProps {
   title?: string;
   content?: string;
-  images?: string[]; // images + videos
+  images?: string[];
   onNext?: () => void;
   final?: boolean;
 }
 
-// Detect video files
 const isVideo = (src: string) => /\.(mp4|webm|ogg)$/i.test(src);
 
 export default function StoryCard({
@@ -21,7 +20,8 @@ export default function StoryCard({
   onNext,
   final = false,
 }: StoryCardProps) {
-  // Keyboard navigation
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === "ArrowRight" || e.key === "Enter") onNext?.();
@@ -32,123 +32,134 @@ export default function StoryCard({
 
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.95, y: 20 }}
-      animate={{ opacity: 1, scale: 1, y: 0 }}
-      exit={{ opacity: 0, scale: 0.95, y: -20 }}
-      transition={{ duration: 0.8 }}
-      className="relative w-full max-w-4xl mx-auto bg-[#1f0d1f]
-           rounded-3xl shadow-2xl p-8
-           flex flex-col items-center gap-6
-           max-h-[85vh] overflow-y-auto
-           scrollbar-thin scrollbar-thumb-primary/40 scrollbar-track-transparent"
-    style={{
-    scrollbarWidth: "thin",           // Firefox
-    scrollbarColor: "rgba(255,255,255,0.2) transparent" // Firefox
-  }}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      transition={{ duration: 0.6 }}
+      className="
+        relative w-full max-w-5xl mx-auto
+        bg-[#1f0d1f] rounded-3xl shadow-2xl
+        px-4 sm:px-8 py-6 sm:py-8
+        flex flex-col gap-5
+        max-h-[85vh] overflow-y-auto
+        custom-scrollbar
+      "
     >
       {/* TITLE */}
       {title && (
-        <motion.h2
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2, duration: 0.6 }}
-          className="text-4xl md:text-5xl font-black text-primary text-center"
-        >
+        <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-primary text-center">
           {title}
-        </motion.h2>
+        </h2>
       )}
 
       {/* CONTENT */}
       {content && (
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5, duration: 0.6 }}
-          className="text-text-muted text-center max-w-2xl"
-        >
+        <p className="text-sm sm:text-base md:text-lg text-text-muted text-center max-w-2xl mx-auto">
           {content}
-        </motion.p>
+        </p>
       )}
 
-      {/* MEDIA GRID */}
+      {/* MEDIA */}
       {images.length > 0 && (
-        <div className="flex flex-wrap justify-center gap-6 mt-6 overflow-visible">
-          {images.map((src, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.7 + i * 0.2, duration: 0.6 }}
-              className="relative group w-80 h-80 md:w-48 md:h-48"
-            >
-              {/* MEDIA CONTAINER */}
-              <div
-                className="relative w-full h-full rounded-xl overflow-hidden
-                           border border-[#48233c] shadow-md
-                           transition-transform duration-500 ease-out
-                           group-hover:scale-[1.45] group-hover:z-50"
+        <div
+          className="
+            grid gap-4 mt-4
+            grid-cols-1
+            sm:grid-cols-2
+            lg:grid-cols-3
+          "
+        >
+          {images.map((src, i) => {
+            const isActive = activeIndex === i;
+
+            return (
+              <motion.div
+                key={i}
+                className="relative"
+                whileTap={{ scale: 0.97 }}
               >
-                {/* IMAGE OR VIDEO */}
-                {isVideo(src) ? (
-                  <video
-                    src={src}
-                    muted
-                    loop
-                    playsInline
-                    preload="metadata"
-                    autoPlay
-                    className="w-full h-full object-cover"
-                    onMouseEnter={(e) => e.currentTarget.play()}
-                    onMouseLeave={(e) => e.currentTarget.pause()}
-                  />
-                ) : (
-                  <img
-                    src={src}
-                    alt=""
-                    className="w-full h-full object-cover"
-                  />
-                )}
-
-                {/* HOVER OVERLAY */}
                 <div
-                  className="absolute inset-0 bg-black/40 opacity-0
-                             group-hover:opacity-100 transition-opacity duration-300"
-                />
-
-                {/* DOWNLOAD BUTTON */}
-                <a
-                  href={src}
-                  download
-                  className="absolute bottom-3 right-3 px-3 py-1.5
-                             rounded-lg bg-primary text-black
-                             text-sm font-bold shadow-lg
-                             opacity-0 translate-y-2
-                             group-hover:opacity-100
-                             group-hover:translate-y-0
-                             transition-all duration-300"
+                  onClick={() =>
+                    setActiveIndex(isActive ? null : i)
+                  }
+                  className={`
+                    relative w-full aspect-square
+                    rounded-xl overflow-hidden
+                    border border-[#48233c]
+                    transition-transform duration-300
+                    ${isActive ? "scale-[1.05] z-20" : ""}
+                  `}
                 >
-                  ⬇ Download
-                </a>
-              </div>
-            </motion.div>
-          ))}
+                  {isVideo(src) ? (
+                    <video
+                      src={src}
+                      muted
+                      loop
+                      playsInline
+                      autoPlay
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <img
+                      src={src}
+                      alt=""
+                      className="w-full h-full object-cover"
+                      loading="lazy"
+                    />
+                  )}
+
+                  {/* Overlay */}
+                  <div
+                    className={`
+                      absolute inset-0 bg-black/40
+                      transition-opacity duration-300
+                      ${isActive ? "opacity-100" : "opacity-0 sm:hover:opacity-100"}
+                    `}
+                  />
+
+                  {/* Download */}
+                  <a
+                    href={src}
+                    download
+                    className={`
+                      absolute bottom-3 right-3
+                      px-3 py-1.5 rounded-lg
+                      bg-primary text-black text-xs sm:text-sm font-bold
+                      transition-all duration-300
+                      ${
+                        isActive
+                          ? "opacity-100 translate-y-0"
+                          : "opacity-0 translate-y-2 sm:group-hover:opacity-100"
+                      }
+                    `}
+                  >
+                    ⬇ Download
+                  </a>
+                </div>
+              </motion.div>
+            );
+          })}
         </div>
       )}
 
-      {/* NEXT BUTTON */}
+      {/* CTA */}
       {onNext && (
-        <motion.button
+        <button
           onClick={onNext}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          className={`mt-6 px-6 py-3 rounded-xl font-bold shadow-glow transition ${
-            final
-              ? "bg-[#ff2eb3] hover:bg-primary"
-              : "bg-primary hover:bg-[#ff2eb3]"
-          }`}
+          className={`
+            mt-6 self-center
+            px-6 sm:px-8 py-3
+            rounded-xl font-bold
+            transition shadow-glow
+            ${
+              final
+                ? "bg-[#ff2eb3] hover:bg-primary"
+                : "bg-primary hover:bg-[#ff2eb3]"
+            }
+          `}
         >
           {final ? "🎉 Celebrate 2026!" : "Next ▶"}
-        </motion.button>
+        </button>
       )}
     </motion.div>
   );

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Volume2, VolumeX } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -33,13 +33,21 @@ export default function Intro() {
     setTimeout(() => router.push("/identity"), 1800);
   };
 
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.play().catch(() => {
+        console.log("Autoplay blocked, waiting for user interaction");
+      });
+    }
+  }, []);
+
   return (
     <div className="relative h-screen w-screen overflow-hidden bg-background-dark text-white">
       {/* Background Video */}
       <motion.video
         ref={videoRef}
         autoPlay
-        muted={!soundOn} // respect global sound state
+        muted // respect global sound state
         loop
         playsInline
         initial={{ scale: 1, opacity: 1 }}
